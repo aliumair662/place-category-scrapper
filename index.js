@@ -1,5 +1,6 @@
 
-const puppeteer = require('puppeteer');
+const chromium = require("chrome-aws-lambda");
+const puppeteer = require("puppeteer-core");
 const express = require('express');
 
 const app = express();
@@ -21,17 +22,10 @@ app.get('/scrape', async (req, res) => {
         }
         // const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const browser = await puppeteer.launch({
-            args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--single-process"
-            ],
-            executablePath: process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
-            headless: true
+            args: chromium.args,
+            executablePath: await chromium.executablePath || "/usr/bin/chromium-browser",
+            headless: chromium.headless,
         });
-      
 
 
         const page = await browser.newPage();
