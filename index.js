@@ -18,7 +18,15 @@ app.get('/scrape', async (req, res) => {
         if (!cid) {
             return res.status(400).json({ error: "CID parameter is required" });
         }
-        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        // const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            executablePath: await puppeteer.executablePath(),
+        });
+        
+
+
         const page = await browser.newPage();
         
         await page.goto(cid , { waitUntil: 'networkidle2' });
