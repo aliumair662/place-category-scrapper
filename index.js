@@ -1,3 +1,4 @@
+const chromium = require("chrome-aws-lambda");
 const puppeteer = require('puppeteer');
 const express = require('express');
 
@@ -19,11 +20,12 @@ app.get('/scrape', async (req, res) => {
             return res.status(400).json({ error: "CID parameter is required" });
         }
         // const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            executablePath: await puppeteer.executablePath(),
-        });
+        const browser = await chromium.puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+          });
         
 
 
