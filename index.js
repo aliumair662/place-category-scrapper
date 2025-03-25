@@ -1,57 +1,69 @@
-
 const chromium = require("chrome-aws-lambda");
 const puppeteer = require("puppeteer-core");
-const express = require('express');
+const express = require("express");
 
 const app = express();
 
-// Root route
-app.get('/', (req, res) => {
-    res.send('Hello, Node.js!');
+app.get("/", (req, res) => {
+    res.send("Hello, Node.js!");
 });
 
-// Scraping route
-app.get('/scrape', async (req, res) => {
+app.get("/scrape", async (req, res) => {
     try {
-
-        const { cid } = req.query;  
-        console.log("id",cid)
-
+        const { cid } = req.query;
         if (!cid) {
             return res.status(400).json({ error: "CID parameter is required" });
         }
-        // const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+
+        console.log("Starting browser...");
+
+        // Fetch Chromium executable path
+        const executablePath = await chromium.executablePath;
+        console.log("Chromium executable path:", executablePath);
+
+        if (!executablePath) {
+            throw new Error("Chromium executable path is undefined.");
+        }
+
         const browser = await puppeteer.launch({
-            args: chromium.args,
-            executablePath: await chromium.executablePath || "/usr/bin/chromium-browser",
+            args: [
+                ...chromium.args,
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process",
+            ],
+            executablePath, // Ensures it is correctly resolved
             headless: chromium.headless,
         });
 
+        console.log("Browser launched successfully!");
 
         const page = await browser.newPage();
-        
-        await page.goto(cid , { waitUntil: 'networkidle2' });
+        await page.goto(cid, { waitUntil: "networkidle2" });
 
-        // Wait for the button to appear
+        console.log("Page loaded:", cid);
+
         await page.waitForSelector("button.DkEaL", { timeout: 10000 });
 
-        // Extract category
         const category = await page.evaluate(() => {
             let categoryElement = document.querySelector("button.DkEaL");
             return categoryElement ? categoryElement.innerText : "Category not found!";
         });
+
+        console.log("Extracted category:", category);
 
         await browser.close();
 
         res.json({ categories: [category] });
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Scraping failed:", error);
         res.status(500).json({ error: "Scraping failed" });
     }
 });
 
-// Start Express server
 app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
+    console.log("Server running on http://localhost:3000");
 });
