@@ -23,9 +23,13 @@ app.get('/scrape', async (req, res) => {
         const browser = await puppeteer.launch({
             args: [
                 "--no-sandbox",
-                "--disable-setuid-sandbox"
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--single-process"
             ],
-            headless: "new" // Ensures better compatibility
+            executablePath: process.env.CHROME_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
+            headless: true
         });
       
 
