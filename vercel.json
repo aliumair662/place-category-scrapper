@@ -11,11 +11,6 @@
         "src": "/.*",
         "dest": "/index.js"
       }
-    ],
-    "functions": {
-      "api/index.js": {
-        "includeFiles": "node_modules/puppeteer/.local-chromium/**"
-      }
-    }
+    ]
   }
   
