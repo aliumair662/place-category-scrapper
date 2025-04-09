@@ -51,7 +51,7 @@ app.get("/api/scrape", async (req, res) => {  // <-- Change to `/api/scrape`
 
         console.log("Page loaded:", cid);
 
-        await page.waitForSelector("button.DkEaL", { timeout: 5000 });
+        await page.waitForSelector("button.DkEaL", { timeout: 10000 });
 
         const category = await page.evaluate(() => {
             let categoryElement = document.querySelector("button.DkEaL");
